@@ -72,4 +72,36 @@ object ApplicationFactory {
             paymentCalculator = paymentCalculator,
         )
     }
+
+    fun createWithDatabase(
+        databaseFile: Path = Paths.get(System.getProperty("user.home"), ".splendor_kotlin", "splendor.db"),
+        rules: GameRules = GameRules(),
+    ): ApplicationServices {
+        val connectionFactory = DatabaseConnectionFactory(databaseFile)
+        val playerRepository = DatabasePlayerRepository(connectionFactory)
+        val gameRepository = DatabaseGameRepository(connectionFactory)
+        val resultRepository = DatabaseGameResultRepository(connectionFactory)
+        val statsRepository = DatabasePlayerStatisticsRepository(connectionFactory)
+        val statisticsService = StatisticsService(statsRepository)
+        val scoreCalculator = ScoreCalculator()
+        val paymentCalculator = PaymentCalculator()
+        val moveProcessor = MoveProcessor(rules, paymentCalculator = paymentCalculator)
+        val gameService = GameService(
+            gameRepository = gameRepository,
+            gameResultRepository = resultRepository,
+            playerRepository = playerRepository,
+            moveProcessor = moveProcessor,
+            gameInitializer = GameInitializer(),
+            scoreCalculator = scoreCalculator,
+            statisticsService = statisticsService,
+            rules = rules,
+        )
+        return ApplicationServices(
+            playerService = PlayerService(playerRepository, statsRepository),
+            gameService = gameService,
+            statisticsService = statisticsService,
+            ratingService = RatingService(statsRepository),
+            paymentCalculator = paymentCalculator,
+        )
+    }
 }
