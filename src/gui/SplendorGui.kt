@@ -35,7 +35,7 @@ import javax.swing.SwingUtilities
 import javax.swing.Timer
 
 class SplendorGui(
-    private val services: ApplicationServices = ApplicationFactory.createWithFiles(),
+    private val services: ApplicationServices = ApplicationFactory.createWithDatabase(),
 ) : JFrame("Splendor") {
     private val playerListModel = DefaultListModel<String>()
     private val playerList = JList(playerListModel)
